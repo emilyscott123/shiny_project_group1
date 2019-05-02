@@ -1,5 +1,6 @@
 library(shiny)
 library(plotrix)
+library(seqinr)
 
 ui<-fluidPage(
   
@@ -9,6 +10,7 @@ ui<-fluidPage(
              value = "Enter FASTA sequence...", 
              width = NULL, placeholder = NULL ),
   
+  # Addition of a submit-type button so user can decide when they are finish entering a sequence
   submitButton("Submit Sequence", icon = NULL, width = NULL ),
   
   helpText("Be sure to enter only DNA sequences containing the base pairs
@@ -34,7 +36,7 @@ server <- function(input, output)
 {
   
   # Count the number of base pairs entered by the user 
-  output$length <- renderPrint(length(input$seq))
+  output$length <- renderPrint({length(input$seq)
   
   # Count the number of each base pair (A, T, C, G) entered by the user
   for (base in input$seq)
@@ -45,6 +47,8 @@ server <- function(input, output)
     C <- sum(seq==("C"))
     
   }
+  }
+)
   # Will display the sequence entered by the user
   output$value <- renderPrint({input$seq})
   
@@ -109,7 +113,7 @@ basLabel <- paste(basLabel, baspct) #add percent to base labels
 basLabel <- paste(basLabel, "%", sep ="") #add % to labels
 print(pie3D(slices, labels = basLabel, explode= 0.1, main = "Pie Chart of Bases"))
 
-  }    
-}
+}    
+
 
 shinyApp(ui = ui, server = server)
