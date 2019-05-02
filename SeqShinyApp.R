@@ -18,16 +18,13 @@ ui<-fluidPage(
           an analysis of the sequence will be displayed, including the total number
           of base pairs, the percentage of each base pair type, and the amino acid 
           sequence that the DNA codes for."),
-
-  #Practice, I don't think we actually need this in our code. We need to calculate the seq length in our code for our users.
-  sliderInput(inputId = "inputSeq", 
-              label = "How long is your sequence?", 
-              value = 25, min = 1, max = 100)
   
-  ,
   # Output() functions
   plotOutput(outputId = "pie"),
   textOutput(outputId = "seq"),
+  textOutput(outputId = "length"),
+  textOutput(outputId =  "base"),
+  textOutput(outputId = "codons"),
   textOutput(outputId = "amino_acids")
   
 )
@@ -36,21 +33,28 @@ server <- function(input, output)
 {
   
   # Count the number of base pairs entered by the user 
-  output$length <- renderPrint({length(input$seq)
+  output$length <- renderPrint({nchar(input$seq)})
   
   # Count the number of each base pair (A, T, C, G) entered by the user
-  for (base in input$seq)
+  
+  output$base <- renderPrint(
   {
-    A <- sum(seq==("A"))
-    T <- sum(seq==("T"))
-    G <- sum(seq==("G"))
-    C <- sum(seq==("C"))
-    
-  }
+    for (base in input$seq)
+    {
+      A <- sum(input$seq == "A")
+      T <- sum(input$seq == "T")
+      G <- sum(input$seq == "G")
+      C <- sum(input$seq == "C")
+      
+    } 
+      print(A)
+      print(T)
+      print(G)
+      print(C)
   }
 )
   # Will display the sequence entered by the user
-  output$value <- renderPrint({input$seq})
+  output$seq <- renderPrint({input$seq})
   
   # Code to create a pie chart of the bases
   output$pie <- renderPlot({pie3D(slices, labels = basLabel, explode= 0.1, main = "Pie Chart of Bases")})
@@ -60,7 +64,7 @@ server <- function(input, output)
   output$codons <- renderText({
     
     # Installed the "seqinr" package to split sequence up into codons.
-    input <- s2c("ATGGATGGGA") # Store user input sequence as a variable # MDG for example to aa
+    input <- s2c(input$seq) # Store user input sequence as a variable # MDG for example to aa
                            # s2c is a utility function used to convert string into characters
     sequence <- splitseq(seq= input, frame = 0 , word= 3)
   })
