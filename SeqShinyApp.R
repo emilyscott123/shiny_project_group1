@@ -25,20 +25,16 @@ ui<-fluidPage(
   ,
   # Output() functions
   plotOutput(outputId = "pie"),
-  output$seq,
-  output$inputSeq,
-  
+  textOutput(outputId = "seq"),
   textOutput(outputId = "amino_acids")
   
-  
 )
-
 
 server <- function(input, output)
 {
   
   # Count the number of base pairs entered by the user 
-  length(input$seq)
+  output$length <- renderPrint(length(input$seq))
   
   # Count the number of each base pair (A, T, C, G) entered by the user
   for (base in input$seq)
@@ -57,16 +53,16 @@ server <- function(input, output)
   
   # Code for splitting into codons
   # Splits up sequences into groups of three base pairs (i.e. codons)
-  output$codons <- renderText({})
+  output$codons <- renderText({
     
     # Installed the "seqinr" package to split sequence up into codons.
     input <- s2c("ATGGATGGGA") # Store user input sequence as a variable # MDG for example to aa
                            # s2c is a utility function used to convert string into characters
     sequence <- splitseq(seq= input, frame = 0 , word= 3)
-  
+  })
   # Code for assigning contains to an amino acid; code for putting together aa sequence
     
-  output$amino_acids <- renderText({})
+  output$amino_acids <- renderText({
 
 get_aa_sequence <- function(sequence= sequence){
     
@@ -88,18 +84,18 @@ get_aa_sequence <- function(sequence= sequence){
     stop_codons <- list('TAA', 'TAG', 'TGA')
     
     aa_sequence <- " " # Initialize variable to store amino acids as they are added to the sequence
-    for (item in sequence){
+    for (item in sequence)
+    {
       
       
       aa_sequence <- aa_sequence + amino_acid_code_codon_chart.get(item)
       print(aa_sequence)
       
     }
-    
+  }
     
 }
-shinyApp(ui = ui, server = server)
-
+)
 #Practice Pie Chart
 seq = cbind("A", "T", "G", "C")
 A <- sum(seq==("A"))
@@ -113,4 +109,7 @@ basLabel <- paste(basLabel, baspct) #add percent to base labels
 basLabel <- paste(basLabel, "%", sep ="") #add % to labels
 print(pie3D(slices, labels = basLabel, explode= 0.1, main = "Pie Chart of Bases"))
 
-      
+  }    
+}
+
+shinyApp(ui = ui, server = server)
