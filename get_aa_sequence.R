@@ -20,7 +20,7 @@ get_aa_sequence <- function(seq)
   
   
   
-  str_plit(seq,'') %>%
+split(seq,' ',n=3) %>%
      unlist()
   
   for (item in sequence)
@@ -34,8 +34,6 @@ get_aa_sequence <- function(seq)
 }
 
 
-}
-)
 lappend <- function(aa_sequence, amino_acids ) {
   lst[[length(aa_sequence, amino_acids)]] <- obj
   return(aa_sequence)

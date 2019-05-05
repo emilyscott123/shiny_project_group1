@@ -88,8 +88,10 @@ server <- function(input, output)
   
   # Code for assigning contains to an amino acid; code for putting together aa sequence
     
-  output$amino_acids <- renderText({
-
+  output$amino_acids <- renderText
+    get_aa_sequence()
+    
+    
 
 #Practice Pie Chart
 seq = cbind("A", "T", "G", "C")
