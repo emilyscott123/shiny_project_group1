@@ -20,7 +20,7 @@ get_aa_sequence <- function(seq)
   
   
   
-split(seq,' ',n=3) %>%
+  split(seq,as.numeric(gl(length(seq),3,length(seq))))  %>%
      unlist()
   
   for (item in sequence)
