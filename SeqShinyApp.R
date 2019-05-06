@@ -18,7 +18,7 @@ ui<-fluidPage(
              width = NULL, placeholder = NULL ),
   
   # Addition of a submit-type button so user can decide when they are finish entering a sequence
-  submitButton("Submit Sequence", icon = NULL, width = NULL ),
+  submitButton("Submit"),
   
   # Output() functions
   plotOutput(outputId = "bar"),
@@ -32,9 +32,9 @@ ui<-fluidPage(
 
 server <- function(input, output)
 {
-  
-  seq_input <- reactiveVal('')
-  observeEvent(input$seq,{seq_input()})
+  seq_input <- eventReactive(input$Submit, {runif(input$seq)})
+  #seq_input <- reactiveVal('')
+  #observeEvent(input$seq,{seq_input()})
   
   # Count the number of base pairs entered by the user 
   output$length <- renderPrint({nchar(seq_input)
@@ -54,9 +54,9 @@ server <- function(input, output)
         {
           ""
         }else{
-          base_numbers <- table(seq_input)
-          strsplit(base_numbers, '' ) %>%
-            unlist(seq_input)
+          #base_numbers <- table(seq_input)
+          base_numbers <- strsplit(seq_input, "")
+          base_numbers <- unlist(base_numbers)
             print(sum(base_numbers =="A"))
             print(sum(base_numbers =="T"))
             print(sum(base_numbers =="G"))
