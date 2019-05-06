@@ -1,6 +1,6 @@
 library(shiny)
-library(plotrix)
 library(seqinr)
+library(Biostrings)
 
 ui<-fluidPage(
   
@@ -43,38 +43,52 @@ server <- function(input, output)
                               
   })
   
+  seq_input <- eventReactive(input$Submit, {runif(input$seq)})
+  #seq_input <- reactiveVal('')
+  #observeEvent(input$seq,{seq_input()})
+  
   # Count the number of base pairs entered by the user 
-  output$length <- renderPrint({nchar(input$seq)})
+  output$length <- renderPrint({nchar(seq_input)
+    if(seq_input() == '')
+    {
+      ""
+    }else{
+      nchar(seq_input())
+    }
+  })
   
   # Count the number of each base pair (A, T, C, G) entered by the user
   
   output$base <- renderPrint(
     {
-      for (base in input$seq)
+      if(seq_input() == '')
       {
-        A <- s2c(input$seq)
-        A_sum <- sum(A == "A")
-        T_sum <- sum(T == "T")
-        G_sum <- sum(G == "G")
-        C_sum <- sum(C == "C")
-        slices <- c(A_sum, T_sum, G_sum, C_sum)
-        basLabel <- c("A", "T", "G", "C")
-        baspct <- round(slices/sum(slices)*100)
-        basLabel <- paste(basLabel, baspct) #add percent to base labels
-        basLabel <- paste(basLabel, "%", sep ="") #add % to labels
-        
-        
-        
-      } 
-      print( A_sum)
-      print( T_sum)
-      print( G_sum)
-      print( C_sum)
-      
-    }
-  )
+        ""
+      }else{
+        #base_numbers <- table(seq_input)
+        base_numbers <- strsplit(seq_input, "")
+        base_numbers <- unlist(base_numbers)
+        print(sum(base_numbers =="A"))
+        print(sum(base_numbers =="T"))
+        print(sum(base_numbers =="G"))
+        print(sum(base_numbers =="C"))
+      }
+    })
+  # for (base in seq_input)
+  #{
+  # A <- s2c(seq_input)
+  # A_sum <- sum(A == "A")
+  #T_sum <- sum(A == "T")
+  #G_sum <- sum(A == "G")
+  #C_sum <- sum(A == "C")
+  # } 
+  # print(A_sum)
+  #print(T_sum)
+  #print(G_sum)
+  # print(C_sum)
+  
   # Will display the sequence entered by the user
-  output$seq <- renderPrint({input$seq})
+  output$seq <- renderPrint({toupper(input$seq)})
   
   # Code to create a pie chart of the bases
   output$bar <- renderPlot({  
@@ -115,38 +129,47 @@ server <- function(input, output)
   
   output$amino_acids <- renderText({
     
-      get_aa_sequence <- function(sequence= sequence){
-      
-      amino_acid_code_codon_chart <- {
-        'TTT'='F'; 'TTC'='F'; 'TTA'='L'; 'TTG'='L'; 'TCT'='S';
-        'TCC'='S'; 'TCA'='S'; 'TCG'='S'; 'TAT'='Y'; 'TAC'='Y';
-        'TGT'='C'; 'TGC'='C'; 'TGG'='W'; 'CTT'='L'; 'CTC'='L';
-        'CTA'='L'; 'CTG'='L'; 'CCT'='P'; 'CCC'='P'; 'CCA'='P';
-        'CCG'='P'; 'CAT'='H'; 'CAC'='H'; 'CAA'='Q'; 'CAG'='Q';
-        'CGT'='R'; 'CGC'='R'; 'CGA'='R'; 'CGG'='R'; 'ATT'='I';
-        'ATC'='I'; 'ATA'='I'; 'ATG'='M'; 'ACT'='T'; 'ACC'='T';
-        'ACA'='T'; 'ACG'='T'; 'AAT'='N'; 'AAC'='N'; 'AAA'='K';
-        'AAG'='K'; 'AGT'='S'; 'AGC'='S'; 'AGA'='R'; 'AGG'='R';
-        'GTT'='V'; 'GTC'='V'; 'GTA'='V'; 'GTG'='V'; 'GCT'='A';
-        'GCC'='A'; 'GCA'='A'; 'GCG'='A'; 'GAT'='D'; 'GAC'='D';
-        'GAA'='E'; 'GAG'='E'; 'GGT'='G'; 'GGC'='G'; 'GGA'='G';
-        'GGG'='G'}
-      
-      stop_codons <- list('TAA', 'TAG', 'TGA')
-      
-      aa_sequence <- " " # Initialize variable to store amino acids as they are added to the sequence
-      for (item in sequence)
-      {
-        
-        
-        aa_sequence <- aa_sequence + amino_acid_code_codon_chart.get(item)
-        print(aa_sequence)
-        
-      }
-    }
-    
-  }
-  )
+    input <- s2c(input$seq)
+    sequence <- splitseq(seq= input, frame = 0 , word= 3)
+    amino_acid <- getGeneticCode()(sequence)
+    print(amino_acid)
+    # get aa_sequence
+  } )
+  
+  # output$amino_acids <- renderText({
+  #   
+  #     get_aa_sequence <- function(sequence= sequence){
+  #     
+  #     amino_acid_code_codon_chart <- {
+  #       'TTT'='F'; 'TTC'='F'; 'TTA'='L'; 'TTG'='L'; 'TCT'='S';
+  #       'TCC'='S'; 'TCA'='S'; 'TCG'='S'; 'TAT'='Y'; 'TAC'='Y';
+  #       'TGT'='C'; 'TGC'='C'; 'TGG'='W'; 'CTT'='L'; 'CTC'='L';
+  #       'CTA'='L'; 'CTG'='L'; 'CCT'='P'; 'CCC'='P'; 'CCA'='P';
+  #       'CCG'='P'; 'CAT'='H'; 'CAC'='H'; 'CAA'='Q'; 'CAG'='Q';
+  #       'CGT'='R'; 'CGC'='R'; 'CGA'='R'; 'CGG'='R'; 'ATT'='I';
+  #       'ATC'='I'; 'ATA'='I'; 'ATG'='M'; 'ACT'='T'; 'ACC'='T';
+  #       'ACA'='T'; 'ACG'='T'; 'AAT'='N'; 'AAC'='N'; 'AAA'='K';
+  #       'AAG'='K'; 'AGT'='S'; 'AGC'='S'; 'AGA'='R'; 'AGG'='R';
+  #       'GTT'='V'; 'GTC'='V'; 'GTA'='V'; 'GTG'='V'; 'GCT'='A';
+  #       'GCC'='A'; 'GCA'='A'; 'GCG'='A'; 'GAT'='D'; 'GAC'='D';
+  #       'GAA'='E'; 'GAG'='E'; 'GGT'='G'; 'GGC'='G'; 'GGA'='G';
+  #       'GGG'='G'}
+  #     
+  #     stop_codons <- list('TAA', 'TAG', 'TGA')
+  #     
+  #     aa_sequence <- " " # Initialize variable to store amino acids as they are added to the sequence
+  #     for (item in sequence)
+  #     {
+  #       
+  #       
+  #       aa_sequence <- aa_sequence + amino_acid_code_codon_chart.get(item)
+  #       print(aa_sequence)
+  #       
+  #     }
+  #   }
+  #   
+  # }
+  # )
 
   
 }    
