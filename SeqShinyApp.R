@@ -5,17 +5,12 @@ library(seqinr)
 ui<-fluidPage(
   
   helpText("Welcome to Quick DNA Sequence Analysis! Be sure to enter only DNA sequences containing the base pairs
-           A, T, C, and G for this particular Shiny App. When you click 'Submit', 
+           A, T, C, and G for this particular Shiny App. When you click 'Submit Sequence', 
            an analysis of the sequence will be displayed, including the total number
            of base pairs, the percentage of each base pair type, and the amino acid 
            sequence that the DNA codes for."),
   
   # Input() functions,
-  helpText("Be sure to enter only DNA sequences containing the base pairs
-           A, T, C, and G for this particular Shiny App. When you click 'Submit Sequence', 
-           an analysis of the sequence will be displayed, including the total number
-           of base pairs, the percentage of each base pair type, and the amino acid 
-           sequence that the DNA codes for."),
   
   textInput( inputId = "seq", 
              label = "Enter your FASTA sequence here:", 
@@ -38,40 +33,53 @@ ui<-fluidPage(
 server <- function(input, output)
 {
   
+  seq_input <- reactiveVal('')
+  observeEvent(input$seq,{seq_input()})
+  
   # Count the number of base pairs entered by the user 
-  output$length <- renderPrint({nchar(input$seq)})
+  output$length <- renderPrint({nchar(seq_input)
+    if(seq_input() == '')
+    {
+      ""
+    }else{
+      nchar(seq_input())
+    }
+  })
   
   # Count the number of each base pair (A, T, C, G) entered by the user
   
   output$base <- renderPrint(
-    {
-      for (base in input$seq)
       {
-        A <- s2c(input$seq)
-        A_sum <- sum(A == "A")
-        T_sum <- sum(T == "T")
-        G_sum <- sum(G == "G")
-        C_sum <- sum(C == "C")
-        slices <- c(A_sum, T_sum, G_sum, C_sum)
-        basLabel <- c("A", "T", "G", "C")
-        baspct <- round(slices/sum(slices)*100)
-        basLabel <- paste(basLabel, baspct) #add percent to base labels
-        basLabel <- paste(basLabel, "%", sep ="") #add % to labels
-        
-        
-        
-      } 
-      print( A_sum)
-      print( T_sum)
-      print( G_sum)
-      print( C_sum)
+        if(seq_input() == '')
+        {
+          ""
+        }else{
+          base_numbers <- table(seq_input)
+          strsplit(base_numbers, '' ) %>%
+            unlist(seq_input)
+            print(sum(base_numbers =="A"))
+            print(sum(base_numbers =="T"))
+            print(sum(base_numbers =="G"))
+            print(sum(base_numbers =="C"))
+        }
+      })
+     # for (base in seq_input)
+      #{
+       # A <- s2c(seq_input)
+       # A_sum <- sum(A == "A")
+        #T_sum <- sum(A == "T")
+        #G_sum <- sum(A == "G")
+        #C_sum <- sum(A == "C")
+     # } 
+     # print(A_sum)
+      #print(T_sum)
+      #print(G_sum)
+     # print(C_sum)
       
-    }
-  )
   # Will display the sequence entered by the user
-  output$seq <- renderPrint({input$seq})
+  output$seq <- renderPrint({toupper(input$seq)})
   
-  # Code to create a pie chart of the bases
+  # Code to create a bar graph of the bases
   output$bar <- renderPlot({  
                             basLabel <- c("A", "T", "G", "C")
                             A <- s2c(input$seq)
@@ -91,9 +99,9 @@ server <- function(input, output)
                                           legend.text = basLabel,
                                           col = c("red", "blue", "yellow", "black"),
                                           args.legend = list(x="topleft"),
-                                          ylab = "Percentage (%)",
+                                          ylab = "Percentage (%) of Bases",
                                           border = "dark blue",
-                                          main = "Bar Graph of Bases"))
+                                          main = "Bar Graph of Bases in DNA Sequence"))
     
   })
   
@@ -102,7 +110,7 @@ server <- function(input, output)
   output$codons <- renderText({
     
     # Installed the "seqinr" package to split sequence up into codons.
-    input <- s2c(input$seq) # Store user input sequence as a variable # MDG for example to aa
+    input <- s2c(toupper(input$seq)) # Store user input sequence as a variable # MDG for example to aa
     # s2c is a utility function used to convert string into characters
     sequence <- splitseq(seq= input, frame = 0 , word= 3)
   })
@@ -110,36 +118,14 @@ server <- function(input, output)
   
   output$amino_acids <- renderText({
     
-      get_aa_sequence()
+    input <- s2c(input$seq)
+    sequence <- splitseq(seq= input, frame = 0 , word= 3)
+    amino_acid <- getGeneticCode()(sequence)
+    print(amino_acid)
+    # get aa_sequence
  } )
-  #Practice Pie Chart
-  seq = cbind("A", "T", "G", "C", "T")
-  seq_sum <- 5
-  A_sum <- sum(seq==("A"))
-  T_sum <- sum(seq==("T"))
-  G_sum <- sum(seq==("G"))
-  C_sum <- sum(seq==("C"))
-  slices <- c(A, T, G, C)
-  basLabel <- c("A", "T", "G", "C")
-  baspct <- round(slices/sum(slices)*100)
   
-  #Practice Bar Graph
-  basLabel <- c("A", "T", "G", "C")
-  percent <- cbind(A_percent <- (A_sum/seq_sum*100),
-                   T_percent <- (T_sum/seq_sum*100),
-                   G_percent <- (G_sum/seq_sum*100),
-                   C_percent <- (C_sum/seq_sum*100))
-  basLabel <- paste(basLabel, percent, "%") #add % to labels
-  print(barplot(height = percent,
-               beside = TRUE,
-               width = 1, 
-               legend.text = basLabel,
-               col = c("red", "blue", "yellow", "black"),
-               args.legend = list(x="topleft"),
-               ylab = "Percentage (%)",
-               border = "dark blue",
-               main = "Bar Graph of Bases"))
-  
+ 
 }    
 
 
