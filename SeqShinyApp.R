@@ -20,6 +20,7 @@ ui<-fluidPage(
   submitButton("Submit Sequence", icon = NULL, width = NULL ),
   
   # Output() functions
+  textOutput(outputId = "error"),
   plotOutput(outputId = "bar"),
   textOutput(outputId = "seq"),
   textOutput(outputId = "length"),
@@ -31,6 +32,16 @@ ui<-fluidPage(
 
 server <- function(input, output)
 {
+  #Produce an error message if the sequence does not make sense
+  output$error <- renderText({
+                              A <- s2c(input$seq)
+                              if (any((A != "A") & (A != "T") & (A != "G") & (A != "C"))) {
+                                print("You need to enter only FASTA formatted DNA base pairs A, T, G, and C, please try again")
+                              } else {
+                                  print("Thank you!")
+                                }
+                              
+  })
   
   # Count the number of base pairs entered by the user 
   output$length <- renderPrint({nchar(input$seq)})
@@ -136,33 +147,7 @@ server <- function(input, output)
     
   }
   )
-  #Practice Pie Chart
-  seq = cbind("A", "T", "G", "C", "T")
-  seq_sum <- 5
-  A_sum <- sum(seq==("A"))
-  T_sum <- sum(seq==("T"))
-  G_sum <- sum(seq==("G"))
-  C_sum <- sum(seq==("C"))
-  slices <- c(A, T, G, C)
-  basLabel <- c("A", "T", "G", "C")
-  baspct <- round(slices/sum(slices)*100)
-  
-  #Practice Bar Graph
-  basLabel <- c("A", "T", "G", "C")
-  percent <- cbind(A_percent <- (A_sum/seq_sum*100),
-                   T_percent <- (T_sum/seq_sum*100),
-                   G_percent <- (G_sum/seq_sum*100),
-                   C_percent <- (C_sum/seq_sum*100))
-  basLabel <- paste(basLabel, percent, "%") #add % to labels
-  print(barplot(height = percent,
-               beside = TRUE,
-               width = 1, 
-               legend.text = basLabel,
-               col = c("red", "blue", "yellow", "black"),
-               args.legend = list(x="topleft"),
-               ylab = "Percentage (%)",
-               border = "dark blue",
-               main = "Bar Graph of Bases"))
+
   
 }    
 
