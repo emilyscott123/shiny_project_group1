@@ -1,2 +1,2 @@
 # shiny_project_group1
-Input a sequence, output calculations and pie chart.
+This is an app that is designed to help make DNA analysis simpler. The user need only input a DNA sequence in all caps such as "ATGGTACCTTCA" and the app will break down the sequence into codons. THe codons will then be translated into amino acids and the codons will be further broken down into their nucleic acids. Percentages of composition of these nucleic acids will calculated and presented to the user in a bar graph.
