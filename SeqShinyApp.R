@@ -44,12 +44,15 @@ server <- function(input, output)
       toupper(input$seq),
       tmp<-c("A", "T", "G", "C"), # Creates list of A,T,G,C
       tmp <- table(tmp), # Makes into a table with four different columns A, T, G, C
-      tmp[]<-0, # Sets all base values to zero
+      tmp[]<-0, # Sets all base values to zero 
       base_numbers <- strsplit(seq_input, ""), # Splits up input sequence into individual characters
       base_numbers <- unlist(base_numbers), # Unlists the base_numbers variable
-      base_numbers <- table(base_numbers),  # Makes variable into a table
-      tmp[] <- base_numbers, # Does not work- need to append tmp table with base_numbers
-      tmp_per<-tmp/((sum(tmp))*100),
+      sum_A <- sum(base_numbers =="A"), # Calculate the number of adenine (A)
+      sum_T <- sum(base_numbers =="T"), # Calculate the number of thymine (T)
+      sum_G <- sum(base_numbers =="G"), # Calculate the number of guanine (G)
+      sum_C <- sum(base_numbers =="C"), # Calculate the number of cytosine (C)
+      tmp[] <- c(sum_A, sum_C, sum_G, sum_T), # Replace O's with new values
+      tmp_per<-tmp/(sum(tmp))*100,
       TMP<-c("Number", tmp),
       tmp_PER<-c("Percent", tmp_per),
       tmp_total<-rbind((TMP), (tmp_PER))
