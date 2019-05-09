@@ -9,8 +9,11 @@ ui<-fluidPage(
            A, T, C, and G for this particular Shiny App. When you click 'Submit Sequence', 
            an analysis of the sequence will be displayed, including the total number
            of base pairs, the percentage of each base pair type, and the amino acid 
-           sequence that the DNA codes for. Be warned, your sequence will be striped if
-           if it doesn't contain a number of base pairs divisible by three."),
+           sequence that the DNA codes for. Here are some things to be aware of when entering a sequence:
+           
+           The end of your sequence will be striped if it doesn't contain a number of base pairs divisible by three.
+
+           The number of characters is in the ENTIRE sequence, not just those that make up codons."),
   
   tags$style(type="text/css",
              ".shiny-output-error { visibility: hidden; }",
@@ -23,7 +26,7 @@ ui<-fluidPage(
   
   # Addition of a submit-type button so user can decide when they are finish entering a sequence
   #submitButton("Submit Sequence", icon = NULL, width = NULL ),
-  actionButton("button", "Submit", icon = icon("refresh")), 
+  actionButton("button", "Submit", icon = NULL), 
   
   # Output() functions
   textOutput(outputId = "error"),
@@ -32,6 +35,7 @@ ui<-fluidPage(
   textOutput(outputId = "codons"),
   textOutput(outputId = "amino_acids"),
   textOutput(outputId = "length"),
+  textOutput(outputId = "codon_count"),
   tableOutput(outputId =  "base")
   
   )
@@ -82,7 +86,7 @@ server <- function(input, output)
     ba <- ((seq_input()))
     ba <- s2c(ba)
     if (all((ba == "A") | (ba=="T") | (ba=="G") | ( ba == "C"))) {   
-      print("Thank you")
+      print("Thank you! Enjoy your results!")
     } else {
       error=TRUE
       print("You need to enter only FASTA formatted DNA base pairs A, T, G, and C, please try again")
@@ -92,7 +96,7 @@ server <- function(input, output)
  #if (error != TRUE){
    ###SEQUENCE
    # Will display the sequence entered by the user
-   output$seq <- renderPrint({(seq_input())})
+   output$seq <- renderPrint({print(paste0("This is the DNA sequence entered: " , seq_input(), "."))})
           # if (error = TRUE){
           #   print("There is an error")
           # }
@@ -106,7 +110,7 @@ server <- function(input, output)
           {
             "0"
           }else{
-            nchar(seq_input())
+            print(paste("The number of bases in the ENTIRE sequence is:" ,  nchar(seq_input()) , "."))
           }
         })
         
@@ -130,6 +134,7 @@ server <- function(input, output)
                                                 col = c("red", "blue", "yellow", "black"),
                                                 args.legend = list(x="bottomright"),
                                                 ylab = "Percentage (%)",
+                                                xlab= "Bases",
                                                 border = "dark blue",
                                                 main = "Bar Graph of Bases"))
         })
@@ -150,8 +155,19 @@ server <- function(input, output)
           input <- (s2c(seq_input())) # Store user input sequence as a variable # MDG for example to aa
           # s2c is a utility function used to convert string into characters
           sequence <- splitseq(seq= input, frame = 0 , word= 3)
-          print(paste("Codon:",  sequence))
+          print(sequence)
         })
+    
+    ###CODON CHARACTER COUNT
+    
+    output$codon_count <- renderText({
+      
+      input <- (s2c(seq_input())) # Store user input sequence as a variable # MDG for example to aa
+      # s2c is a utility function used to convert string into characters
+      sequence <- splitseq(seq= input, frame = 0 , word= 3)
+      sequence_codon_char <- nchar(sequence)
+      print(paste("The number of bases that is found in the CODONS ONLY is:" , sum(sequence_codon_char), "."))
+    })
         
     ###AMINO ACID
     # Code for assigning contains to an amino acid; code for putting together aa sequence
@@ -159,9 +175,8 @@ server <- function(input, output)
           
           input <- (s2c(seq_input()))
           sequence <- splitseq(seq= input, frame = 0 , word= 3)
-          amino_acid <- getGeneticCode()(sequence)
-          print(paste("Amino Acid:", amino_acid))
-          # get aa_sequence
+          amino_acid <- getGeneticCode()[(sequence)]
+          print(amino_acid)
         } )
         
  #}else{break}      
