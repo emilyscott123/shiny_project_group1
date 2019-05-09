@@ -65,74 +65,44 @@ server <- function(input, output)
     new_base_input<- strsplit(new_seq_input,"")%>%
                      unlist()%>%
                      table()
-    tmp_per<-(round((base_input()/sum(base_input()))*100))
-    TMP<-c("Number", base_input())
+    tmp_per<-(round((new_base_input/sum(new_base_input))*100))
+    TMP<-c("Number", new_base_input)
     tmp_PER<-c("Percent", tmp_per)
-    tmp_total<-table(rbind((TMP), (tmp_PER)))
-    #new_base_input <-
+    new_base_input <-(rbind((TMP), (tmp_PER)))
+
     
     #change stored value of base_input
     base_input(new_base_input)
     
   }, ignoreInit=TRUE)
-    
-    # seq_input(
-    #   (toupper(input$seq)),
-    #   tmp<-c("A", "T", "G", "C"),
-    #   tmp<- table(tmp),
-    #   tmp[]<-0,
-    #   tmp<-(seq_input),
-    #   tmp_per<-tmp/sum(tmp),
-    #   TMP<-c("Number", tmp),
-    #   tmp_PER<-c("Percent", tmp_per),
-    #   tmp_total<-rbind((TMP), (tmp_PER))
-    # )
-    
-    
-    
-    # base_input(
-    #   #the percentages of base pairs shown in graph
-    #   percent <- (tmp_per),
-    #   
-    #   #the label for the bar graph
-    #   bases <- c("A", "T", "G", "C"),
-    #   basLabel <- paste(bases, tmp_per, "%")
-    #    )
-    # })
   
-
   
   ###ERROR
   #Produce an error message if the sequence does not make sense
   output$error <- renderText({
     ba <- ((seq_input()))
     ba <- s2c(ba)
-    ca <- c(A|T|G|C)
-    if (any (all(any(ba == "A") | any(ba=="T") | any(ba=="G") | any( ba == "C")))) {   #(any(ba != "A") & any(ba != "T") & any(ba != "G") & any(ba != "C"))) {
-      print("Thank you!")
-      
+    if (all((ba == "A") | (ba=="T") | (ba=="G") | ( ba == "C"))) {   #(any(ba != "A") & any(ba != "T") & any(ba != "G") & any(ba != "C"))) {
+      print("Thank you")
     } else {
-      print("You need to enter only FASTA formatted DNA base pairs A, T, G, and C, please try again")
       error=TRUE
-      
+      print("You need to enter only FASTA formatted DNA base pairs A, T, G, and C, please try again")
       }
-    
   })
   
-  
-  
-        ###SEQUENCE
-        # Will display the sequence entered by the user
-        output$seq <- renderPrint({(seq_input())})
+ #if (error != TRUE){
+   ###SEQUENCE
+   # Will display the sequence entered by the user
+   output$seq <- renderPrint({(seq_input())})
           # if (error = TRUE){
           #   print("There is an error")
           # }
           # else{(seq_input())}
           # })
         
-        ###NUMBER BASE PAIRS
-        # Count the number of base pairs entered by the user 
-        output$length <- renderPrint({nchar(seq_input())
+    ###NUMBER BASE PAIRS
+    # Count the number of base pairs entered by the user 
+    output$length <- renderPrint({   #nchar(seq_input())
           if(seq_input() == '')
           {
             "0"
@@ -141,16 +111,20 @@ server <- function(input, output)
           }
         })
         
-        ###BAR GRAPH
-        # Code to create a bar graph of the bases
-        output$bar <- renderPlot({  
-                                  tmp_per<-(round((base_input()/sum(base_input()))*100))
-                                  TMP<-c("Number", base_input())
-                                  tmp_PER<-c("Percent", tmp_per)
-                                  tmp_total<-table(rbind((TMP), (tmp_PER)))
+    ###BAR GRAPH
+    # Code to create a bar graph of the bases
+    output$bar <- renderPlot({  
+                                  seqq<-s2c(seq_input())
+                                  as<-sum(seqq=="A")
+                                  ts<-sum(seqq=="T")
+                                  gs<-sum(seqq=="G")
+                                  cs<-sum(seqq=="C")
+                                  total<-sum(as,ts,gs,cs)
+                                  percent<-c(as, ts, gs, cs)
+                                  percent<-round((percent/total)*100)
                                   bases <- c("A", "T", "G", "C")
-                                  basLabel <- paste(bases, tmp_per, "%")
-                                  print(barplot(height = tmp_per,
+                                  basLabel <- paste(bases, percent, "%")
+                                  print(barplot(height = percent,
                                                 beside = TRUE,
                                                 width = 1, 
                                                 legend.text = basLabel,
@@ -159,44 +133,19 @@ server <- function(input, output)
                                                 ylab = "Percentage (%)",
                                                 border = "dark blue",
                                                 main = "Bar Graph of Bases"))
-          
         })
         
-        ###BASES TABLE
-        # Count the number of each base pair (A, T, C, G) entered by the user
-        output$base <- renderTable(
+    ###BASES TABLE
+    # Count the number of each base pair (A, T, C, G) entered by the user
+    output$base <- renderTable(
           {
-            
-            (tmp_total, rownames= ( "Number", "Percent"), colnames=("A", "T", "G", "C"))
-            #tmp_per<-(round((base_input()/sum(base_input()))*100))
-            
-            #TMP<-c("Number", base_input())
-            #print(TMP)
-            #tmp_PER<-c("Percent", tmp_per)
-            #print(tmp_PER)
-            #tmp_total<-(table((TMP), (tmp_PER)))
-            #print(tmp_total)
-            #print((tmp_total))
-            #print(base_input)
-            # if(seq_input() == '')
-            # {
-            #   "0"
-            # }else{
-            #   #base_numbers <- table(seq_input)
-            #   base_numbers <- strsplit(seq_input(), "")
-            #   base_numbers <- unlist(base_numbers)
-            #   print(tmp_total)
-            #   #print(sum(base_numbers =="A"))
-            #   #print(sum(base_numbers =="T"))
-            #   #print(sum(base_numbers =="G"))
-            #   #print(sum(base_numbers =="C"))
-            # }
-          })
+            base_input()
+          }) 
         
-        ###CODONS
-        # Code for splitting into codons
-        # Splits up sequences into groups of three base pairs (i.e. codons)
-        output$codons <- renderText({
+    ###CODONS
+    # Code for splitting into codons
+    # Splits up sequences into groups of three base pairs (i.e. codons)
+    output$codons <- renderText({
           
           # Installed the "seqinr" package to split sequence up into codons.
           input <- ((seq_input())) # Store user input sequence as a variable # MDG for example to aa
@@ -204,9 +153,9 @@ server <- function(input, output)
           sequence <- splitseq(seq= input, frame = 0 , word= 3)
         })
         
-        ###AMINO ACID
-        # Code for assigning contains to an amino acid; code for putting together aa sequence
-        output$amino_acids <- renderText({
+    ###AMINO ACID
+    # Code for assigning contains to an amino acid; code for putting together aa sequence
+    output$amino_acids <- renderText({
           
           input <- (toupper(seq_input()))
           sequence <- splitseq(seq= input, frame = 0 , word= 3)
@@ -215,8 +164,9 @@ server <- function(input, output)
           # get aa_sequence
         } )
         
-        
-      }    
+ #}else{break}      
+}    
+
 
 
 shinyApp(ui = ui, server = server)
