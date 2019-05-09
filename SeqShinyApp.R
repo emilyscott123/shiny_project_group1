@@ -4,16 +4,19 @@ library(Biostrings)
 library(magrittr)
 
 ui<-fluidPage(
-  
-  helpText("Welcome to Quick DNA Sequence Analysis! Be sure to enter only DNA sequences containing the base pairs
-           A, T, C, and G for this particular Shiny App. When you click 'Submit Sequence', 
-           an analysis of the sequence will be displayed, including the total number
-           of base pairs, the percentage of each base pair type, and the amino acid 
-           sequence that the DNA codes for. Here are some things to be aware of when entering a sequence:
-           
-           The end of your sequence will be striped if it doesn't contain a number of base pairs divisible by three.
-           
-           The number of characters is in the ENTIRE sequence, not just those that make up codons."),
+  helpText(tags$b("Welcome to Quick DNA Sequence Analysis!")),
+  helpText("Be sure to enter only DNA sequences containing the base pairs
+           A, T, C, and G for this particular Shiny App. When you click 'Submit'
+           an analysis of the sequence will be displayed, including:"),
+  helpText("1) the sequence entered by the user
+           2) the total number of bases in the sequence entered
+           3) the total number of bases found in the codons of the sequence
+           4) the codons of the sequence entered. Note that base pairs are stripped off the end of the sequence if it is not divisible by threebands()
+           5) the amino acid sequence translated from the codons the sequence was broken down into
+           6) the number and percentage of each base pair found in the ENTIRE sequence entered presented as a table
+           7) the percentage of each base pair displayed as a bar graph."),
+    helpText("Be aware of the following when entering a sequence:
+           The end of your sequence will be striped if it does not contain a number of base pairs divisible by three."),
   
   #Hide Errors
   tags$style(type="text/css",
