@@ -63,7 +63,7 @@ The number of bases in JUST THE CODONS will be provided:
 
 ```r
 seq_input <- "ATGTGAGTGAGTGA"
-input <- (s2c(seq_input)) # Store user input sequence as a variable # MDG for example to aa
+input <- (s2c(seq_input)) # Store user input sequence as a variable 
 # s2c is a utility function used to convert string into characters
 sequence <- splitseq(seq= input, frame = 0 , word= 3)
 sequence_codon_char <- nchar(sequence)
@@ -81,7 +81,7 @@ The codons of the sequences will be given as an output, in addition to those cod
 seq_input <- "ATGTGAGTGAGTGA"
 
 #Installed the "seqinr" package to split sequence up into codons.
-input <- (s2c(seq_input)) # Store user input sequence as a variable # MDG for example to aa
+input <- (s2c(seq_input)) # Store user input sequence as a variable 
 # s2c is a utility function used to convert string into characters
 sequence <- splitseq(seq= input, frame = 0 , word= 3)
 print(sequence)
@@ -155,5 +155,5 @@ seqq<-s2c(seq_input))
                                                 border = "dark blue",
                                                 main = "Bar Graph of Bases"))
 
-## The output will be a bar graph of teh bases found in the sequence entered. 
+## The output will be a bar graph of the bases found in the sequence entered. 
 ```
