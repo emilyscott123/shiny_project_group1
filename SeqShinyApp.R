@@ -30,10 +30,10 @@ ui<-fluidPage(
   textOutput(outputId = "error"),
   plotOutput(outputId = "bar"),
   textOutput(outputId = "seq"),
-  textOutput(outputId = "length"),
-  tableOutput(outputId =  "base"),
   textOutput(outputId = "codons"),
-  textOutput(outputId = "amino_acids")
+  textOutput(outputId = "amino_acids"),
+  textOutput(outputId = "length"),
+  tableOutput(outputId =  "base")
   
   )
 
@@ -82,7 +82,7 @@ server <- function(input, output)
   output$error <- renderText({
     ba <- ((seq_input()))
     ba <- s2c(ba)
-    if (all((ba == "A") | (ba=="T") | (ba=="G") | ( ba == "C"))) {   #(any(ba != "A") & any(ba != "T") & any(ba != "G") & any(ba != "C"))) {
+    if (all((ba == "A") | (ba=="T") | (ba=="G") | ( ba == "C"))) {   
       print("Thank you")
     } else {
       error=TRUE
@@ -102,7 +102,7 @@ server <- function(input, output)
         
     ###NUMBER BASE PAIRS
     # Count the number of base pairs entered by the user 
-    output$length <- renderPrint({   #nchar(seq_input())
+    output$length <- renderPrint({   
           if(seq_input() == '')
           {
             "0"
@@ -148,19 +148,20 @@ server <- function(input, output)
     output$codons <- renderText({
           
           # Installed the "seqinr" package to split sequence up into codons.
-          input <- ((seq_input())) # Store user input sequence as a variable # MDG for example to aa
+          input <- (s2c(seq_input())) # Store user input sequence as a variable # MDG for example to aa
           # s2c is a utility function used to convert string into characters
           sequence <- splitseq(seq= input, frame = 0 , word= 3)
+          print(paste("Codon:",  sequence))
         })
         
     ###AMINO ACID
     # Code for assigning contains to an amino acid; code for putting together aa sequence
     output$amino_acids <- renderText({
           
-          input <- (toupper(seq_input()))
+          input <- (s2c(seq_input()))
           sequence <- splitseq(seq= input, frame = 0 , word= 3)
           amino_acid <- getGeneticCode()(sequence)
-          print(amino_acid)
+          print(paste("Amino Acid:", amino_acid))
           # get aa_sequence
         } )
         
